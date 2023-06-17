@@ -10,6 +10,9 @@ func main() {
 	// Load .env file
 	config.LoadEnv()
 
+	// Connect to database
+	config.Connect()
+
 	// Start server
 	app := fiber.New()
 
