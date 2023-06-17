@@ -6,5 +6,7 @@ import (
 )
 
 func AllRoutes(app *fiber.App) {
-	app.Get("/", Controllers.Index)
+	api := app.Group("/api")
+	api.Get("/index", Controllers.Index)
+	api.Get("/example", Controllers.Example)
 }
