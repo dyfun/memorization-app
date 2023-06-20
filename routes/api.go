@@ -13,4 +13,5 @@ func AllRoutes(app *fiber.App) {
 	// User routes
 	user := api.Group("/user")
 	user.Post("/create", Controllers.UserCreate)
+	user.Post("/login", Controllers.UserLogin)
 }

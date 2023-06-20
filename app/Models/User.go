@@ -5,7 +5,16 @@ type User struct {
 	Email     string `json:"email"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
-	Password  string
+	Password  string `json:"password"`
+}
+
+type UserLogin struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+func (u *User) GetId() uint {
+	return u.ID
 }
 
 func (u *User) SetEmail(email string) {

@@ -4,7 +4,10 @@ import (
 	"github.com/dyfun/memorization-app/app/Models"
 	"github.com/dyfun/memorization-app/config"
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
+	"os"
+	"time"
 )
 
 func UserCreate(c *fiber.Ctx) error {
@@ -29,5 +32,50 @@ func UserCreate(c *fiber.Ctx) error {
 	// Create user
 	config.Db.Create(&user)
 
-	return nil
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"message": "user created",
+	})
+}
+
+func UserLogin(c *fiber.Ctx) error {
+	// Body parser
+	request := new(Models.UserLogin)
+	if err := c.BodyParser(request); err != nil {
+		return err
+	}
+
+	// Find user in database and assign to existUser
+	var user Models.User
+	if err := config.Db.Where("email = ?", request.Email).First(&user).Error; err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"message": "E-mail or password wrong",
+		})
+	}
+
+	// Compare password
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.Password)); err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"message": "E-mail or password wrong",
+		})
+	}
+
+	// Create JWT token
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"email": user.GetEmail(),
+		"id":    user.GetId(),
+		"exp":   time.Now().Add(time.Hour * 24).Unix(),
+	})
+
+	// Sign token
+	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Could not login",
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"token": tokenString,
+	})
 }
