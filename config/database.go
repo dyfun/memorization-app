@@ -28,7 +28,7 @@ func Connect() *gorm.DB {
 	}
 
 	// Migrate the schema
-	db.AutoMigrate(&Models.User{})
+	db.AutoMigrate(&Models.User{}, &Models.Word{})
 
 	Db = db
 	return nil

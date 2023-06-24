@@ -19,7 +19,7 @@ func UserCreate(c *fiber.Ctx) error {
 	}
 
 	// Check if user exists
-	if err := config.Db.Where("email = ?", user.GetEmail()).First(&user).Error; err == nil {
+	if err := config.Db.Where("email = ?", user.Email).First(&user).Error; err == nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "User already exists",
 		})
@@ -27,7 +27,7 @@ func UserCreate(c *fiber.Ctx) error {
 
 	// Hashing the password
 	hash, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-	user.SetPassword(string(hash))
+	user.Password = string(hash)
 
 	// Create user
 	config.Db.Create(&user)
@@ -41,7 +41,9 @@ func UserLogin(c *fiber.Ctx) error {
 	// Body parser
 	request := new(Models.UserLogin)
 	if err := c.BodyParser(request); err != nil {
-		return err
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": err.Error(),
+		})
 	}
 
 	// Find user in database and assign to existUser
@@ -61,8 +63,8 @@ func UserLogin(c *fiber.Ctx) error {
 
 	// Create JWT token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"email": user.GetEmail(),
-		"id":    user.GetId(),
+		"email": user.Email,
+		"id":    user.ID,
 		"exp":   time.Now().Add(time.Hour * 24).Unix(),
 	})
 
