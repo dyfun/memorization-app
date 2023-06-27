@@ -2,8 +2,8 @@ Developing a simple api with go and mysql
 
 ## Installation for development
 ```bash
-air init
 go mod download
+air init
 air
 ```
 ## Docker
