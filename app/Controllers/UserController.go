@@ -1,11 +1,11 @@
 package Controllers
 
 import (
+	"github.com/dyfun/memorization-app/app/Helper"
 	"github.com/dyfun/memorization-app/app/Models"
 	"github.com/dyfun/memorization-app/config"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
-	"golang.org/x/crypto/bcrypt"
 	"os"
 	"time"
 )
@@ -26,8 +26,7 @@ func UserCreate(c *fiber.Ctx) error {
 	}
 
 	// Hashing the password
-	hash, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-	user.Password = string(hash)
+	user.Password = Helper.EncryptPassword(user.Password)
 
 	// Create user
 	config.Db.Create(&user)
@@ -55,7 +54,8 @@ func UserLogin(c *fiber.Ctx) error {
 	}
 
 	// Compare password
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.Password)); err != nil {
+	checkPassword := Helper.DecryptPassword(request.Password, user.Password)
+	if checkPassword == false {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"message": "E-mail or password wrong",
 		})
