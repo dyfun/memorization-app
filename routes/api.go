@@ -22,4 +22,8 @@ func AllRoutes(app *fiber.App) {
 	word.Get("/all", Controllers.GetWords)
 	word.Put("/update/:id", Controllers.UpdateWord)
 	word.Delete("/delete/:id", Controllers.DeleteWord)
+
+	// Favorite routes
+	favorite := api.Group("/favorite").Use(Middleware.Auth)
+	favorite.Post("/add", Controllers.AddFavorite)
 }
