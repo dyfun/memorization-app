@@ -11,7 +11,8 @@ import (
 )
 
 func UserCreate(c *fiber.Ctx) error {
-	user := new(Models.User)
+	user := new(Models.UserRegister)
+	newUser := new(Models.User)
 
 	// Set body to user struct
 	if err := c.BodyParser(user); err != nil {
@@ -19,17 +20,19 @@ func UserCreate(c *fiber.Ctx) error {
 	}
 
 	// Check if user exists
-	if err := config.Db.Where("email = ?", user.Email).First(&user).Error; err == nil {
+	if err := config.Db.Where("email = ?", user.Email).First(&newUser).Error; err == nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "User already exists",
 		})
 	}
 
-	// Hashing the password
-	user.Password = Helper.EncryptPassword(user.Password)
-
 	// Create user
-	config.Db.Create(&user)
+	newUser.FirstName = user.FirstName
+	newUser.LastName = user.LastName
+	newUser.Email = user.Email
+	newUser.Password = Helper.EncryptPassword(user.Password)
+
+	config.Db.Create(&newUser)
 
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"message": "user created",
