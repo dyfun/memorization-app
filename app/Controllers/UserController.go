@@ -34,6 +34,16 @@ func UserCreate(c *fiber.Ctx) error {
 
 	config.Db.Create(&newUser)
 
+	// Send welcome mail
+	to := []string{"gulertayfun@outlook.com"}
+	var mailData = struct {
+		Name string
+	}{
+		Name: "Tayfun",
+	}
+	template := "resources/views/mail/register.html"
+	Helper.SendEmail(to, "Welcome!", template, mailData)
+
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"message": "user created",
 	})
