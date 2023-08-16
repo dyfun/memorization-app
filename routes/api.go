@@ -18,7 +18,7 @@ func AllRoutes(app *fiber.App) {
 
 	// Word routes
 	word := api.Group("/word").Use(Middleware.Auth)
-	word.Post("/add", Controllers.AddWord)
+	word.Post("/add", Middleware.Permission([]string{"user"}), Controllers.AddWord)
 	word.Get("/all", Controllers.GetWords)
 	word.Put("/update/:id", Controllers.UpdateWord)
 	word.Delete("/delete/:id", Controllers.DeleteWord)
