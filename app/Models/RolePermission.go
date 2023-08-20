@@ -3,9 +3,8 @@ package Models
 import "gorm.io/gorm"
 
 type Role struct {
-	Name        string `gorm:"type:varchar(255);not null"`
-	ChildRole   *Role  `gorm:"foreignKey:ChildRoleID"`
-	ChildRoleID int    `gorm:"default:null"`
+	Name           string           `gorm:"type:varchar(255);not null" unique:"true"`
+	RolePermission []RolePermission `gorm:"foreignKey:RoleID"`
 	gorm.Model
 }
 
