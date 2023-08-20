@@ -1,0 +1,19 @@
+info:
+  contact: {}
+paths:
+  /api/index:
+    get:
+      consumes:
+      - application/json
+      description: Hello, World!
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Hello, World!
+          schema:
+            type: string
+      summary: Hello
+      tags:
+      - Hello
+swagger: "2.0"
