@@ -29,6 +29,13 @@ And run
 ```bash
 air
 ```
+## Swagger
+If you want to reload the swagger documentation, you can run following command
+
+```bash
+swag init
+```
+
 ## Docker
 ```bash
 docker-compose up --build
